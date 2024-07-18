@@ -1,6 +1,7 @@
 
 #include "xcom.h"
 #include "util.h"
+#include "json11.hpp"
 
 #include <string>
 #include <iostream>
@@ -52,10 +53,15 @@ static std::string escape(const std::string& str) {
 
 struct json_writer
 {
-    json_writer(const std::string& filename) :
-        out(filename), indent_level(0), skip_indent(true), needs_comma(false)
+    json_writer() :
+        indent_level(0), skip_indent(true), needs_comma(false)
     {
         out.setf(std::ofstream::boolalpha);
+    }
+
+    std::string str() const
+    {
+        return out.str();
     }
 
     void indent()
@@ -204,7 +210,7 @@ struct json_writer
 
 
 private:
-    std::ofstream out;
+    std::ostringstream out;
     size_t indent_level;
     bool skip_indent;
     bool needs_comma;
@@ -564,61 +570,31 @@ void buildJson(const saved_game& save, json_writer& w)
     w.end_object();
 }
 
-void usage(const char * name)
+int xcom2json(std::string save_path, json11::Json& to_write)
 {
-    printf("Usage: %s [-o <out_file>] <in_file>\n", name);
-    printf("-o -- Specify output file name, defaults to <in_file>.json\n");
-}
-
-
-int main(int argc, char *argv[])
-{
-    std::string infile;
-    std::string outfile;
-    std::string tmpfile;
-
-    if (argc <= 1) {
-        usage(argv[0]);
-        return 1;
-    }
-
     setlocale(LC_ALL, "en_US.utf8");
 
-    for (int i = 1; i < argc; ++i) {
-        if (strcmp(argv[i], "-o") == 0) {
-            if (argc <= (i+1)) {
-                usage(argv[0]);
-                return 1;
-            }
-            outfile = argv[++i];
-        }
-        else {
-            if (!infile.empty()) {
-                usage(argv[0]);
-                return 1;
-            }
-
-            infile = argv[i];
-        }
-    }
-
-    if (infile.empty()) {
-        usage(argv[0]);
-        return 1;
-    }
-
-    if (outfile.empty()) {
-        outfile = infile + ".json";
-    }
-
     try {
-        saved_game save = read_xcom_save(infile);
-        json_writer w{ outfile };
+        std::cout << "Reading save file at: " << save_path << std::endl;
+        saved_game save = read_xcom_save(save_path);
+        json_writer w;
         buildJson(save, w);
+
+        std::string err;
+        to_write = json11::Json::parse(w.str(), err);
+
+        if (!err.empty()) {
+            throw std::runtime_error("Failed to parse JSON: " + err);
+        }
         return 0;
     }
     catch (const error::xcom_exception& e) {
         fprintf(stderr, "%s", e.what().c_str());
+        return 1;
+    }
+    catch(const std::runtime_error& e)
+    {
+        fprintf(stderr, "%s", e.what());
         return 1;
     }
 
