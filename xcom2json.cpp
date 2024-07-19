@@ -573,16 +573,13 @@ void buildJson(const saved_game& save, json_writer& w)
 int xcom2json(std::string save_path, json11::Json& to_write)
 {
     setlocale(LC_ALL, "en_US.utf8");
-
     try {
-        std::cout << "Reading save file at: " << save_path << std::endl;
         saved_game save = read_xcom_save(save_path);
         json_writer w;
         buildJson(save, w);
 
         std::string err;
         to_write = json11::Json::parse(w.str(), err);
-
         if (!err.empty()) {
             throw std::runtime_error("Failed to parse JSON: " + err);
         }
@@ -597,7 +594,6 @@ int xcom2json(std::string save_path, json11::Json& to_write)
         fprintf(stderr, "%s", e.what());
         return 1;
     }
-
     fprintf(stderr, "Error: unknown error.\n");
     return 1;
 }

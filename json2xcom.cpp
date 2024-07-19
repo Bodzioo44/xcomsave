@@ -692,10 +692,10 @@ saved_game build_save(const Json& json)
     return save;
 }
 
-void usage(const char * name)
-{
-    printf("Usage: %s [-o <outfile>] <infile>\n", name);
-}
+// void usage(const char * name)
+// {
+//     printf("Usage: %s [-o <outfile>] <infile>\n", name);
+// }
 
 buffer<char> read_file(const std::string& filename)
 {
@@ -724,63 +724,12 @@ buffer<char> read_file(const std::string& filename)
     return buffer<char>{std::move(file_buf), file_length};
 }
 
-int main(int argc, char *argv[])
+
+int json2xcom(std::string save_path, json11::Json& to_write)
 {
-    std::string  infile;
-    std::string outfile;
-
-    if (argc <= 1) {
-        usage(argv[0]);
-        return 1;
-    }
-
-    for (int i = 1; i < argc; ++i) {
-        if (strcmp(argv[i], "-o") == 0) {
-            if (argc <= (i+1)) {
-                usage(argv[0]);
-                return 1;
-            }
-            outfile = argv[++i];
-        }
-        else {
-            if (!infile.empty()) {
-                usage(argv[0]);
-                exit(1);
-            }
-            infile = argv[i];
-        }
-    }
-
-    if (infile.empty()) {
-        usage(argv[0]);
-        return 1;
-    }
-
-    if (outfile.empty()) {
-        size_t pos = infile.rfind(".json");
-        if (pos != std::string::npos) {
-            outfile = infile.substr(0, pos);
-            if (fs::exists(outfile)) {
-                outfile += ".out";
-            }
-        }
-        else {
-            outfile = infile + ".out";
-        }
-    }
-
-    buffer<char> buf = read_file(infile);
-
-    if (buf.length == 0) {
-        return 1;
-    }
-
-    std::string errStr;
-    Json jsonsave = Json::parse(buf.buf.get(), errStr);
-
     try {
-        saved_game save = build_save(jsonsave);
-        write_xcom_save(save, outfile);
+        saved_game save = build_save(to_write);
+        write_xcom_save(save, save_path);
         return 0;
     }
     catch (const error::xcom_exception& e) {
