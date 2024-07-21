@@ -32,28 +32,28 @@ set_target_properties(zlib PROPERTIES LINKER_LANGUAGE C)
 add_library (xcomsave ${xcomsave_sources} ${xcomsave_headers})
 set_target_properties(xcomsave PROPERTIES LINKER_LANGUAGE CXX)
 
-set (xcom2json_sources xcom2json.cpp)
-set (xcom2json_headers)
-add_executable (xcom2json ${xcom2json_sources} ${xcom2json_headers})
-set_target_properties (xcom2json PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(xcom2json xcomsave zlib)
+# set (xcom2json_sources xcom2json.cpp)
+# set (xcom2json_headers)
+# add_executable (xcom2json ${xcom2json_sources} ${xcom2json_headers})
+# set_target_properties (xcom2json PROPERTIES LINKER_LANGUAGE CXX)
+# target_link_libraries(xcom2json xcomsave zlib)
 
-set (json2xcom_sources json2xcom.cpp json11/json11.cpp)
-set (json2xcom_headers json11/json11.hpp)
-add_executable (json2xcom ${json2xcom_sources} ${json2xcom_headers})
-set_target_properties (json2xcom PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(json2xcom xcomsave zlib)
+# set (json2xcom_sources json2xcom.cpp json11/json11.cpp)
+# set (json2xcom_headers json11/json11.hpp)
+# add_executable (json2xcom ${json2xcom_sources} ${json2xcom_headers})
+# set_target_properties (json2xcom PROPERTIES LINKER_LANGUAGE CXX)
+# target_link_libraries(json2xcom xcomsave zlib)
 
-# g++ needs -lstdc++fs for filesystem support.
-if (CMAKE_COMPILER_IS_GNUCXX)
-    target_link_libraries(json2xcom stdc++fs)
-endif (CMAKE_COMPILER_IS_GNUCXX)
+# # g++ needs -lstdc++fs for filesystem support.
+# if (CMAKE_COMPILER_IS_GNUCXX)
+#     target_link_libraries(json2xcom stdc++fs)
+# endif (CMAKE_COMPILER_IS_GNUCXX)
 
-# MacOS builds need -liconv
-if (APPLE)
-    target_link_libraries(xcom2json iconv)
-    target_link_libraries(json2xcom iconv)
-endif (APPLE)
+# # MacOS builds need -liconv
+# if (APPLE)
+#     target_link_libraries(xcom2json iconv)
+#     target_link_libraries(json2xcom iconv)
+# endif (APPLE)
 
-install(TARGETS xcom2json json2xcom RUNTIME DESTINATION bin)
+# install(TARGETS xcom2json json2xcom RUNTIME DESTINATION bin)
 
