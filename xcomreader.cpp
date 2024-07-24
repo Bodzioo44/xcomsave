@@ -789,4 +789,11 @@ namespace xcom
         return read_xcom_save(read_file(infile));
     }
 
+    header read_only_header(const std::string &infile)
+    {
+        buffer<unsigned char> buf = read_file(infile);
+        xcom_io rdr{ std::move(buf) };
+        return read_header(rdr);
+    }
+
 } //namespace xcom
