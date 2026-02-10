@@ -255,6 +255,7 @@ namespace xcom
     property_ptr make_array_property(xcom_io &r, const std::string &name,
             int32_t property_size, xcom_version version)
     {
+        // std::cout << "Making array property " << name << " with size " << property_size << std::endl;
         int32_t array_bound = r.read_int();
         std::unique_ptr<unsigned char[]> array_data;
         int array_data_size = property_size - 4;
@@ -283,6 +284,7 @@ namespace xcom
                 }
                 return std::make_unique<object_array_property>(name, std::move(elements));
             }
+            //number_array_property
             else if (array_bound * 4 == array_data_size) {
                 // If the array data size is exactly 4x the number of elements this is an array
                 // of numbers. We can't tell if they're ints or floats without looking at the UPK, though.
@@ -291,7 +293,7 @@ namespace xcom
                 for (int i = 0; i < array_bound; ++i) {
                     elems.push_back(r.read_int());
                 }
-
+                std::cout << "Guessed number array property with " << elems.size() << " elements" << std::endl;
                 return std::make_unique<number_array_property>(name, std::move(elems));
             }
             else {
@@ -787,6 +789,13 @@ namespace xcom
     saved_game read_xcom_save(const std::string &infile)
     {
         return read_xcom_save(read_file(infile));
+    }
+
+    header read_only_header(const std::string &infile)
+    {
+        buffer<unsigned char> buf = read_file(infile);
+        xcom_io rdr{ std::move(buf) };
+        return read_header(rdr);
     }
 
 } //namespace xcom
