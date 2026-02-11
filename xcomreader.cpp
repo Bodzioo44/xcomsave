@@ -293,7 +293,7 @@ namespace xcom
                 for (int i = 0; i < array_bound; ++i) {
                     elems.push_back(r.read_int());
                 }
-                std::cout << "Guessed number array property with " << elems.size() << " elements" << std::endl;
+                // std::cout << "Guessed number array property with " << elems.size() << " elements" << std::endl;
                 return std::make_unique<number_array_property>(name, std::move(elems));
             }
             else {
